@@ -26,7 +26,7 @@ export default function POSHome({ staff }) {
           { label:"Today's Revenue", value: fmtRWF(revenue), color:'var(--accent)' },
           { label:"Orders Today",    value: fmtN(todayOrders.length) },
           { label:"kg Processed",    value: `${totalKg.toFixed(1)} kg` },
-          { label:"All-Time Orders", value: fmtN(orders.length) },
+          
         ].map(s => (
           <div key={s.label} className="card">
             <div className="stat-value" style={s.color ? { color: s.color } : {}}>{s.value}</div>
