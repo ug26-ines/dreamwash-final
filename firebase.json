@@ -1,0 +1,57 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/admin",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/admin/**",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/ceo",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/ceo/**",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/pos",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/pos/**",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/staff",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/staff/**",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/portal",
+        "destination": "/app.html"
+      },
+      {
+        "source": "/portal/**",
+        "destination": "/app.html"
+      }
+    ]
+  }
+}

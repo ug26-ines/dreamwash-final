@@ -1,0 +1,25 @@
+export const SUBSCRIPTION_PLANS = [
+  {
+    id:          'monthly',
+    name:        '10k Club',
+    price:       10000,
+    kg:          10,
+    months:      1,
+    overageRate: 1300,
+    studentOnly: false,
+    recommended: false,
+    description: '10 kg per month. Cancel anytime.',
+  },
+  {
+    id:          'semester',
+    name:        'Semester Plan',
+    price:       95000,
+    kg:          100,
+    months:      10,
+    overageRate: 1300,
+    studentOnly: true,
+    recommended: true,
+    startMonths: ['September', 'February', 'July'],
+    description: '100 kg over 10 months. One payment. University semester aligned.',
+  },
+];

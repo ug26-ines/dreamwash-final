@@ -1,0 +1,10 @@
+{
+  "indexes": [
+    { "collectionGroup": "orders", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "clientId", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "orders", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "shifts", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "staffId", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }] },
+    { "collectionGroup": "members", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "planEndDate", "order": "ASCENDING" }] },
+    { "collectionGroup": "auditLog", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "timestamp", "order": "DESCENDING" }] }
+  ],
+  "fieldOverrides": []
+}
