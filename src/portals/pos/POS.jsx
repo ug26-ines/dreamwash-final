@@ -9,6 +9,8 @@ import POSBookings from './screens/Bookings';
 import POSZReport  from './screens/ZReport';
 import Toast       from '../../components/shared/Toast';
 import { useToast } from '../../hooks/useToast';
+import { signInWithEmailAndPassword, signOut as firebaseSignOut } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 const NAV = [
   { key:'home',     label:'Home',      Icon: Home },
@@ -24,7 +26,14 @@ export default function POS() {
   const [screen, setScreen] = useState('home');
   const { toasts, toast }   = useToast();
 
-  if (!staff) return <PinLogin onLogin={setStaff} />;
+const handleLogin = async (staffData) => {
+  try {
+    await signInWithEmailAndPassword(auth, 'pos@dreamwash.rw', 'YOUR_POS_PASSWORD');
+  } catch (e) { console.warn('POS auth:', e.message); }
+  setStaff(staffData);
+};
+
+if (!staff) return <PinLogin onLogin={handleLogin} />;
 
   const props = { staff, toast };
 
@@ -43,7 +52,8 @@ export default function POS() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <button className="btn btn-danger btn-sm btn-full" onClick={()=>setStaff(null)}>
+         
+<button className="btn btn-danger btn-sm btn-full" onClick={async()=>{ await firebaseSignOut(auth); setStaff(null); }}>
             <LogOut size={14} /> Sign Out
           </button>
         </div>
