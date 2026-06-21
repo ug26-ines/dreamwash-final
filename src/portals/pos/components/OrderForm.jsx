@@ -1,3 +1,4 @@
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { SERVICE_NAMES, ADDONS, CLIENT_TYPES } from '../../../constants/pricing';
 import { SUBSCRIPTION_PLANS } from '../../../constants/plans';
@@ -6,7 +7,7 @@ import { fmtRWF } from '../../../utils/formatters';
 import { genOrderId, genWarrantNum } from '../../../utils/generators';
 import { addDocument } from '../../../hooks/useFirestore';
 import { serverTimestamp, doc, setDoc, getFirestore } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+
 
 const auth = getAuth();
 const db   = getFirestore();
@@ -91,6 +92,7 @@ export default function OrderForm({ clients, onSuccess, toast }) {
       }, { merge: true });
 
       toast(`${newClient.name.trim()} registered`, 'success');
+      await signInWithEmailAndPassword(auth, 'pos@dreamwash.rw', 'Rwanda@123');
       setShowReg(false);
       setNewClient({ name: '', phone: '', hostel: '' });
       setSearch(newClient.name.trim());
