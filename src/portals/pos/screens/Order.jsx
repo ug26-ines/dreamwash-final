@@ -26,9 +26,6 @@ export default function POSOrder({ toast }) {
     <div className="page-content-wide">
       <div className="flex gap-1" style={{ marginBottom:'1.5rem' }}>
         <button className={`pill ${tab==='order'?'active':''}`} onClick={()=>setTab('order')}>New Order</button>
-        <button className={`pill ${tab==='register'?'active':''}`} onClick={()=>setTab('register')}>
-          <UserPlus size={14} /> Register Client
-        </button>
       </div>
 
       {tab === 'order' && (
