@@ -28,7 +28,7 @@ export default function POS() {
 
 const handleLogin = async (staffData) => {
   try {
-    await signInWithEmailAndPassword(auth, 'pos@dreamwash.rw', 'YOUR_POS_PASSWORD');
+    await signInWithEmailAndPassword(auth, 'pos@dreamwash.rw', 'Rwanda@123');
   } catch (e) { console.warn('POS auth:', e.message); }
   setStaff(staffData);
 };
