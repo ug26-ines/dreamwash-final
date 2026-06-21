@@ -9,16 +9,13 @@ service cloud.firestore {
     function isClient()   { return isAuth() && role() == 'client'; }
     function isOwner(uid) { return isAuth() && request.auth.uid == uid; }
 
-    // Clients look up their own phone to match against orders.clientPhone
     function myPhone() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone;
     }
 
-    // ── Users ────────────────────────────────────────────────────────────────
+    // ── Users ────────────────────────────────────────────────────────
     match /users/{uid} {
       allow read:   if isOwner(uid) || isStaff();
-      // FIX BUG 1: Clients can create their OWN profile document only,
-      // and only with role='client'. CEOs can create any profile (for staff accounts).
       allow create: if isCEO()
                     || (isAuth() && request.auth.uid == uid
                         && request.resource.data.role == 'client');
@@ -26,17 +23,14 @@ service cloud.firestore {
       allow delete: if isCEO();
     }
 
-    // ── Config (rates — CEO only writes, staff read) ──────────────────────────
+    // ── Config ───────────────────────────────────────────────────────
     match /config/{doc} {
       allow read:  if isStaff();
       allow write: if isCEO();
     }
 
-    // ── Orders ───────────────────────────────────────────────────────────────
+    // ── Orders ───────────────────────────────────────────────────────
     match /orders/{id} {
-      // FIX BUG 2: Clients read their own orders by phone match (stored in their profile).
-      // Staff have full read access. Clients can only see orders where clientPhone
-      // matches the phone stored in their own user profile.
       allow read:   if isStaff()
                     || (isClient() && resource.data.clientPhone == myPhone());
       allow create: if isStaff();
@@ -44,25 +38,28 @@ service cloud.firestore {
       allow delete: if isCEO();
     }
 
-    // ── Clients CRM ──────────────────────────────────────────────────────────
+    // ── Clients CRM ──────────────────────────────────────────────────
     match /clients/{id} {
-      // Clients can read their own record (keyed by phone number = document ID).
       allow read:   if isStaff()
-                    || (isClient()
-                        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone == id);
-      allow create: if isStaff();
-      allow update: if isStaff();
+                    || (isClient() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone == id);
+      // FIX: createUserWithEmailAndPassword signs in as the new client immediately,
+      // so isStaff() fails. Allow the newly authenticated user to create/update
+      // their own document (document ID == their uid).
+      allow create: if isStaff()
+                    || (isAuth() && request.auth.uid == id);
+      allow update: if isStaff()
+                    || (isAuth() && request.auth.uid == id);
       allow delete: if isCEO();
     }
 
-    // ── 10k Club Members ─────────────────────────────────────────────────────
+    // ── 10k Club Members ─────────────────────────────────────────────
     match /members/{id} {
       allow read:   if isStaff()
                     || (isClient() && resource.data.phone == myPhone());
       allow write:  if isStaff();
     }
 
-    // ── Subscription requests ─────────────────────────────────────────────────
+    // ── Subscription requests ─────────────────────────────────────────
     match /subscriptionRequests/{id} {
       allow read:   if isStaff()
                     || (isClient() && resource.data.userId == request.auth.uid);
@@ -70,13 +67,13 @@ service cloud.firestore {
       allow update: if isStaff();
     }
 
-    // ── Staff, Businesses, Dispatchers, Dorm Bosses ──────────────────────────
+    // ── Staff, Businesses, Dispatchers, Dorm Bosses ──────────────────
     match /staff/{id}        { allow read: if isStaff(); allow write: if isCEO(); }
     match /businesses/{id}   { allow read: if isStaff(); allow write: if isCEO(); }
     match /dispatchers/{id}  { allow read: if isStaff(); allow write: if isCEO(); }
     match /dormBosses/{id}   { allow read: if isStaff(); allow write: if isCEO(); }
 
-    // ── Shifts ───────────────────────────────────────────────────────────────
+    // ── Shifts ───────────────────────────────────────────────────────
     match /shifts/{id} {
       allow read:   if isCEO()
                     || (isStaff() && resource.data.staffId == request.auth.uid);
@@ -86,19 +83,19 @@ service cloud.firestore {
       allow delete: if isCEO();
     }
 
-    // ── Incidents & Supplies ─────────────────────────────────────────────────
+    // ── Incidents & Supplies ─────────────────────────────────────────
     match /incidents/{id} {
-      allow read:         if isStaff();
-      allow create:       if isStaff();
+      allow read:          if isStaff();
+      allow create:        if isStaff();
       allow update,delete: if isCEO();
     }
     match /supplies/{id} {
-      allow read:         if isStaff();
-      allow create:       if isStaff();
+      allow read:          if isStaff();
+      allow create:        if isStaff();
       allow update,delete: if isCEO();
     }
 
-    // ── Audit log (immutable) ─────────────────────────────────────────────────
+    // ── Audit log (immutable) ─────────────────────────────────────────
     match /auditLog/{id} {
       allow read:          if isCEO();
       allow create:        if isStaff();
