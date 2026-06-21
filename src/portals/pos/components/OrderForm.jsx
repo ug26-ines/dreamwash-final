@@ -15,7 +15,7 @@ const SERVICES = Object.entries(SERVICE_NAMES).map(([key, name]) => ({ key, name
 const PAYMENT_METHODS = ['cash', 'momo'];
 
 export default function OrderForm({ clients, onSuccess, toast }) {
-  const [step,      setStep]     = useState(1); // 1=client, 2=service, 3=review
+  const [step,      setStep]     = useState(1);
   const [clientId,  setClientId] = useState('');
   const [search,    setSearch]   = useState('');
   const [weight,    setWeight]   = useState('');
@@ -24,7 +24,6 @@ export default function OrderForm({ clients, onSuccess, toast }) {
   const [payment,   setPayment]  = useState('cash');
   const [notes,     setNotes]    = useState('');
   const [loading,   setLoading]  = useState(false);
-  // Registration form state
   const [showReg,    setShowReg]    = useState(false);
   const [regLoading, setRegLoading] = useState(false);
   const [newClient,  setNewClient]  = useState({ name: '', phone: '', hostel: '' });
@@ -39,6 +38,7 @@ export default function OrderForm({ clients, onSuccess, toast }) {
   const calc        = weight ? calculateOrder(parseFloat(weight), service, client?.type || 'walkin', addons, kgRemaining) : null;
 
   const toggleAddon = (key) => setAddons(prev => prev.includes(key) ? prev.filter(k=>k!==key) : [...prev, key]);
+
   const registerClient = async () => {
     const cleanPhone = newClient.phone.replace(/\s/g, '');
     if (!newClient.name.trim()) { toast('Enter client name', 'error'); return; }
@@ -62,6 +62,10 @@ export default function OrderForm({ clients, onSuccess, toast }) {
         }
       }
 
+      // FIX: createUserWithEmailAndPassword signs in as the new client.
+      // We now write BOTH documents while authenticated as the new client:
+
+      // 1. clients/{uid} — CRM record (Firestore rule now allows isAuth() && uid == id)
       await setDoc(doc(db, 'clients', uid), {
         uid,
         name:         newClient.name.trim(),
@@ -73,6 +77,17 @@ export default function OrderForm({ clients, onSuccess, toast }) {
         totalSpent:   0,
         createdAt:    serverTimestamp(),
         registeredBy: 'pos',
+      }, { merge: true });
+
+      // 2. users/{uid} — role document so client can log into the portal
+      // Rule allows: isAuth() && request.auth.uid == uid && role == 'client'
+      await setDoc(doc(db, 'users', uid), {
+        uid,
+        name:      newClient.name.trim(),
+        phone:     cleanPhone,
+        email,
+        role:      'client',
+        createdAt: serverTimestamp(),
       }, { merge: true });
 
       toast(`${newClient.name.trim()} registered`, 'success');
@@ -105,7 +120,6 @@ export default function OrderForm({ clients, onSuccess, toast }) {
       });
       toast(`Order ${orderId} created`, 'success');
       onSuccess?.();
-      // reset
       setStep(1); setClientId(''); setSearch(''); setWeight('');
       setService('full'); setAddons([]); setPayment('cash'); setNotes('');
     } catch (e) {
@@ -155,54 +169,54 @@ export default function OrderForm({ clients, onSuccess, toast }) {
               </div>
             ))}
             {!filtered.length && (
-  <div>
-    <p className="text-muted text-sm" style={{ marginBottom: '0.75rem' }}>
-      No clients found.
-    </p>
-    <button className="btn btn-ghost btn-full" onClick={() => setShowReg(true)}
-      style={{ border: '1px dashed var(--accent)', color: 'var(--accent)' }}>
-      + Register New Client
-    </button>
-  </div>
-)}
+              <div>
+                <p className="text-muted text-sm" style={{ marginBottom: '0.75rem' }}>
+                  No clients found.
+                </p>
+                <button className="btn btn-ghost btn-full" onClick={() => setShowReg(true)}
+                  style={{ border: '1px dashed var(--accent)', color: 'var(--accent)' }}>
+                  + Register New Client
+                </button>
+              </div>
+            )}
 
-{showReg && (
-  <div className="card" style={{ background:'var(--accent-dim)', border:'1px solid var(--accent)', marginTop: '0.75rem' }}>
-    <p className="fw-600" style={{ color:'var(--accent)', marginBottom:'0.75rem' }}>
-      Register New Client
-    </p>
-    <div className="field">
-      <label>Full Name *</label>
-      <input className="input" placeholder="Amahoro Jean"
-        value={newClient.name}
-        onChange={e => setNewClient({ ...newClient, name: e.target.value })} />
-    </div>
-    <div className="field">
-      <label>Phone Number *</label>
-      <input className="input" placeholder="0780 000 000" type="tel"
-        value={newClient.phone}
-        onChange={e => setNewClient({ ...newClient, phone: e.target.value })} />
-    </div>
-    <div className="field">
-      <label>Hostel / Area</label>
-      <input className="input" placeholder="e.g. INES Dorm B"
-        value={newClient.hostel}
-        onChange={e => setNewClient({ ...newClient, hostel: e.target.value })} />
-    </div>
-    <p style={{ fontSize: 11, color: 'var(--muted)', marginBottom: '0.75rem' }}>
-      Portal password will be set to <strong>Rwanda@123</strong>
-    </p>
-    <div className="flex gap-1">
-      <button className="btn btn-ghost" onClick={() => setShowReg(false)}>
-        Cancel
-      </button>
-      <button className="btn btn-primary" style={{ flex: 1 }}
-        disabled={regLoading} onClick={registerClient}>
-        {regLoading ? 'Creating…' : 'Register Client'}
-      </button>
-    </div>
-  </div>
-)}
+            {showReg && (
+              <div className="card" style={{ background:'var(--accent-dim)', border:'1px solid var(--accent)', marginTop: '0.75rem' }}>
+                <p className="fw-600" style={{ color:'var(--accent)', marginBottom:'0.75rem' }}>
+                  Register New Client
+                </p>
+                <div className="field">
+                  <label>Full Name *</label>
+                  <input className="input" placeholder="Amahoro Jean"
+                    value={newClient.name}
+                    onChange={e => setNewClient({ ...newClient, name: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>Phone Number *</label>
+                  <input className="input" placeholder="0780 000 000" type="tel"
+                    value={newClient.phone}
+                    onChange={e => setNewClient({ ...newClient, phone: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>Hostel / Area</label>
+                  <input className="input" placeholder="e.g. INES Dorm B"
+                    value={newClient.hostel}
+                    onChange={e => setNewClient({ ...newClient, hostel: e.target.value })} />
+                </div>
+                <p style={{ fontSize: 11, color: 'var(--muted)', marginBottom: '0.75rem' }}>
+                  Portal password will be set to <strong>Rwanda@123</strong>
+                </p>
+                <div className="flex gap-1">
+                  <button className="btn btn-ghost" onClick={() => setShowReg(false)}>
+                    Cancel
+                  </button>
+                  <button className="btn btn-primary" style={{ flex: 1 }}
+                    disabled={regLoading} onClick={registerClient}>
+                    {regLoading ? 'Creating…' : 'Register Client'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           <button className="btn btn-primary btn-full" disabled={!clientId} onClick={()=>setStep(2)}>
             Continue →
