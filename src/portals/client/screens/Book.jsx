@@ -23,7 +23,7 @@ export default function Book({ user, activePlan, onSubmit }) {
   const kgLeft      = activePlan?.kgLeft || 0;
   const coveredKg   = isSubscriber ? Math.min(kg, kgLeft) : 0;
   const overageKg   = isSubscriber ? Math.max(0, kg - kgLeft) : 0;
-  const overageRate = 1500;
+  const overageRate = 1300;
   const overageCost = overageKg * overageRate;
   const walkinSvc   = WALKIN_SERVICES.find(s => s.id === service);
   const walkinCost  = walkinSvc ? walkinSvc.price * kg : 0;
