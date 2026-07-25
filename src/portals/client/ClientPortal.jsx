@@ -406,7 +406,7 @@ function BookingScreen({ user, activePlan, onSubmit }) {
   const kgLeft      = activePlan?.kgLeft || 0;
   const coveredKg   = isSubscriber ? Math.min(kg, kgLeft) : 0;
   const overageKg   = isSubscriber ? Math.max(0, kg - kgLeft) : 0;
-  const overageRate = 1500;
+  const overageRate = 1300;
   const overageCost = overageKg * overageRate;
   const walkinSvc   = WALKIN_SERVICES.find(s => s.id === service);
   const walkinCost  = walkinSvc ? walkinSvc.price * kg : 0;
@@ -769,7 +769,7 @@ function PlanScreen({ user, activePlan, pendingSubscription, onSubscribe }) {
               {loading ? "Sending..." : isPending ? "Request Sent to Reception" : `Send Request — RWF ${fmt(plan.price)}`}
             </button>
             <div style={{ textAlign: "center", color: C.muted, fontSize: 11, marginTop: 12 }}>
-              Payment confirmed at the Dream Wash reception
+              Payment confirmed at the Dream X Wash reception
             </div>
           </>
         )}
