@@ -8,7 +8,6 @@ import { genOrderId, genWarrantNum } from '../../../utils/generators';
 import { addDocument } from '../../../hooks/useFirestore';
 import { serverTimestamp, doc, setDoc, getFirestore } from 'firebase/firestore';
 
-
 const auth = getAuth();
 const db   = getFirestore();
 
@@ -47,53 +46,55 @@ export default function OrderForm({ clients, onSuccess, toast }) {
 
     setRegLoading(true);
     try {
-  const email    = `${cleanPhone}@dreamxwash.rw`;
-  const password = 'Rwanda@123';
+      const email    = `${cleanPhone}@dreamxwash.rw`;
+      const password = 'Rwanda@123';
 
-  let uid;
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    uid = cred.user.uid;
-  } catch (authErr) {
-    if (authErr.code === 'auth/email-already-in-use') {
-      const existing = await signInWithEmailAndPassword(auth, email, password);
-      uid = existing.user.uid;
-    } else { throw authErr; }
-  }
+      let uid;
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        uid = cred.user.uid;
+      } catch (authErr) {
+        if (authErr.code === 'auth/email-already-in-use') {
+          const existing = await signInWithEmailAndPassword(auth, email, password);
+          uid = existing.user.uid;
+        } else { throw authErr; }
+      }
 
-  await setDoc(doc(db, 'clients', uid), {
-    uid,
-    name:         newClient.name.trim(),
-    phone:        cleanPhone,
-    area:         newClient.hostel.trim(),
-    email,
-    type:         'walkin',
-    orders:       0,
-    totalSpent:   0,
-    createdAt:    serverTimestamp(),
-    registeredBy: 'pos',
-  }, { merge: true });
+      await setDoc(doc(db, 'clients', uid), {
+        uid,
+        name:         newClient.name.trim(),
+        phone:        cleanPhone,
+        area:         newClient.hostel.trim(),
+        email,
+        type:         'walkin',
+        orders:       0,
+        totalSpent:   0,
+        createdAt:    serverTimestamp(),
+        registeredBy: 'pos',
+      }, { merge: true });
 
-  await setDoc(doc(db, 'users', uid), {
-    uid, name: newClient.name.trim(),
-    phone: cleanPhone, email,
-    role: 'client', createdAt: serverTimestamp(),
-  }, { merge: true });
+      await setDoc(doc(db, 'users', uid), {
+        uid, name: newClient.name.trim(),
+        phone: cleanPhone, email,
+        role: 'client', createdAt: serverTimestamp(),
+      }, { merge: true });
 
-  // ✅ Restore POS auth session after client registration hijacks it
-  await signInWithEmailAndPassword(auth, 'pos@dreamxwash.rw', 'Rwanda@123');
+      // ✅ Restore POS auth session after client registration hijacks it
+      await signInWithEmailAndPassword(auth, 'pos@dreamxwash.rw', 'Rwanda@123');
 
-  toast(`${newClient.name.trim()} registered ✓`, 'success');
-  setShowReg(false);
-  setNewClient({ name: '', phone: '', hostel: '' });
-  setClientId(uid);   // auto-selects the new client immediately
-  setSearch(newClient.name.trim());
+      toast(`${newClient.name.trim()} registered ✓`, 'success');
+      setShowReg(false);
+      setNewClient({ name: '', phone: '', hostel: '' });
+      setClientId(uid);   // auto-selects the new client immediately
+      setSearch(newClient.name.trim());
 
-} catch (err) {
-  toast('Failed: ' + err.message, 'error');
-  // Always restore POS session even on error
-  try { await signInWithEmailAndPassword(auth, 'pos@dreamxwash.rw', 'Rwanda@123'); } catch {}
-}
+    } catch (err) {
+      toast('Failed: ' + err.message, 'error');
+      // Always restore POS session even on error
+      try { await signInWithEmailAndPassword(auth, 'pos@dreamxwash.rw', 'Rwanda@123'); } catch {}
+    }
+    setRegLoading(false);
+  }; // <--- ADDED MISSING CLOSING BRACKET FOR registerClient
 
   const submit = async () => {
     if (!client || !weight || !service) return;
@@ -314,11 +315,7 @@ export default function OrderForm({ clients, onSuccess, toast }) {
             </button>
           </div>
         </div>
-    
-      );
-      };
-      
-  
-    
-    
-  
+      )} {/* <--- ADDED CLOSING FOR JSX CONDITIONAL RENDER */}
+    </div> {/* <--- ADDED CLOSING DIV FOR MAIN WRAPPER */}
+  );
+} // <--- ADDED CLOSING BRACKET FOR COMPONENT
