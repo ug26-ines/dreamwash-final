@@ -1,195 +1,199 @@
-import { useState } from 'react';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
-import { doc, setDoc, getFirestore, serverTimestamp } from 'firebase/firestore';
+import { useState } from "react";
 
-const auth = getAuth();
-const db   = getFirestore();
+export default function AuthScreen({ onLoginSuccess, toast }) {
 
-const toEmail = (phone) =>
-  `${phone.replace(/\s/g, '')}@dreamxwash.rw`;
+  const [tab, setTab] = useState("login"); // 'login' or 'register'
+  const [regType, setRegType] = useState("ind"); // 'ind' or 'biz'
+  
+  const [error, setError] = useState("");
+  
+  // Form Data State
+  const [formData, setFormData] = useState({
+    email: "", password: "", pass2: "",
+    name: "", phone: "", area: "", ref: "",
+    bizname: "", mgrname: "", mgrphone: "", empname: "", empphone: "",
+    wkweight: "", clothtype: "", priceexp: "", expect: ""
+  });
 
-export default function AuthScreen() {
-  const [mode,     setMode]     = useState('login');
-  const [phone,    setPhone]    = useState('');
-  const [password, setPassword] = useState('');
-  const [name,     setName]     = useState('');
-  const [hostel,   setHostel]   = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setError(""); // Clear error on typing
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    const cleanPhone = phone.replace(/\s/g, '');
-    const email      = toEmail(cleanPhone);
-
-    try {
-      if (mode === 'register') {
-        if (!name.trim()) { setError('Enter your full name.'); setLoading(false); return; }
-        if (!cleanPhone)   { setError('Enter your phone number.'); setLoading(false); return; }
-
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-        await setDoc(doc(db, 'clients', cred.user.uid), {
-          uid:          cred.user.uid,
-          name:         name.trim(),
-          phone:        cleanPhone,
-          hostel:       hostel.trim(),
-          email,
-          orders:       0,
-          totalSpent:   0,
-          createdAt:    serverTimestamp(),
-          registeredBy: 'portal',
-        });
-
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
-    } catch (err) {
-      if (err.code === 'auth/email-already-in-use') {
-        setError(
-          'This phone is already registered. Sign in using your phone and password. ' +
-          'If you were registered by the receptionist, use password: Rwanda@123'
-        );
-      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
-        setError('Incorrect password. If registered at the shop, try: Rwanda@123');
-      } else if (err.code === 'auth/user-not-found') {
-        setError('No account found. Please register first.');
-      } else if (err.code === 'auth/weak-password') {
-        setError('Password must be at least 6 characters.');
-      } else {
-        setError(err.message);
-      }
+  // ─── HANDLERS ───
+  const doLogin = (e) => {
+    e?.preventDefault();
+    if (!formData.email || !formData.password) {
+      setError("Please enter email and password.");
+      return;
     }
-    setLoading(false);
+    
+    // TODO: Replace with your Firebase or backend login logic
+    console.log("Logging in with:", formData.email, formData.password);
+    
+    // If successful:
+    // toast("Welcome back!", "success");
+    // onLoginSuccess(userData);
+  };
+
+  const doRegister = (e) => {
+    e?.preventDefault();
+    if (formData.password !== formData.pass2) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (regType === "ind") {
+      if (!formData.name || !formData.phone || !formData.email) {
+        setError("Please fill all required fields.");
+        return;
+      }
+      console.log("Registering Individual:", formData);
+      // TODO: Firebase create user logic here
+      
+    } else {
+      if (!formData.bizname || !formData.mgrname || !formData.mgrphone || !formData.email) {
+        setError("Please fill all required fields.");
+        return;
+      }
+      console.log("Registering Business:", formData);
+      // TODO: Firebase create user logic here
+    }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center',
-      justifyContent: 'center', padding: 24, background: '#050e1a',
-    }}>
-      <div style={{ width: '100%', maxWidth: 400 }}>
+    <div id="auth-screen">
+      <div className="auth-brand">
+        <div className="auth-logo">Dream Wash</div>
+        <div className="auth-tagline">Musanze's professional laundry service</div>
+      </div>
 
-        {/* Brand */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{
-            fontSize: 26, fontWeight: 800, color: '#00d4b8',
-            letterSpacing: '-0.02em', marginBottom: 4,
-          }}>Dream X Wash</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,.4)' }}>
-            Musanze, Rwanda
+      <div className="auth-card">
+        {/* ── TABS ── */}
+        <div className="auth-tabs">
+          <div 
+            className={`auth-tab ${tab === "login" ? "active" : ""}`} 
+            onClick={() => { setTab("login"); setError(""); }}
+          >
+            Sign In
+          </div>
+          <div 
+            className={`auth-tab ${tab === "register" ? "active" : ""}`} 
+            onClick={() => { setTab("register"); setError(""); }}
+          >
+            Register
           </div>
         </div>
 
-        {/* Card */}
-        <div style={{
-          background: '#0d1f33', borderRadius: 18,
-          padding: '32px 28px', border: '1px solid rgba(255,255,255,.08)',
-        }}>
-
-          {/* Toggle */}
-          <div style={{
-            display: 'flex', background: 'rgba(0,0,0,.3)',
-            borderRadius: 10, padding: 4, marginBottom: 26,
-          }}>
-            {['login', 'register'].map((m) => (
-              <button key={m} onClick={() => { setMode(m); setError(''); }}
-                style={{
-                  flex: 1, padding: '9px', borderRadius: 7, border: 'none',
-                  background: mode === m ? '#00d4b8' : 'transparent',
-                  color: mode === m ? '#050e1a' : 'rgba(255,255,255,.45)',
-                  fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                }}>
-                {m === 'login' ? 'Sign In' : 'Register'}
-              </button>
-            ))}
-          </div>
-
-          <form onSubmit={handleSubmit}>
-
-            {/* Name — register only */}
-            {mode === 'register' && (
-              <div style={{ marginBottom: 14 }}>
-                <label style={labelStyle}>Full Name</label>
-                <input value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Amahoro Jean" style={inputStyle} />
-              </div>
-            )}
-
-            {/* Phone */}
-            <div style={{ marginBottom: 14 }}>
-              <label style={labelStyle}>Phone Number</label>
-              <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                placeholder="0780 000 000" style={inputStyle} />
+        {/* ── LOGIN FORM ── */}
+        {tab === "login" && (
+          <form id="login-form" onSubmit={doLogin}>
+            <div className="fg">
+              <label className="fl">Email</label>
+              <input type="email" className="fi" id="email" placeholder="your@email.com" value={formData.email} onChange={handleChange} />
             </div>
-
-            {/* Hostel / Area — register only */}
-            {mode === 'register' && (
-              <div style={{ marginBottom: 14 }}>
-                <label style={labelStyle}>Hostel / Area</label>
-                <input value={hostel} onChange={e => setHostel(e.target.value)}
-                  placeholder="e.g. INES Dorm B" style={inputStyle} />
-              </div>
-            )}
-
-            {/* Password */}
-            <div style={{ marginBottom: 20 }}>
-              <label style={labelStyle}>Password</label>
-              <input type="password" value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder={mode === 'login' ? '••••••••' : 'Min 6 characters'}
-                style={inputStyle} />
+            <div className="fg">
+              <label className="fl">Password</label>
+              <input type="password" className="fi" id="password" placeholder="••••••••" value={formData.password} onChange={handleChange} />
             </div>
-
-            {/* Error */}
-            {error && (
-              <div style={{
-                background: 'rgba(220,38,38,.12)', border: '1px solid rgba(220,38,38,.3)',
-                borderRadius: 9, padding: '10px 14px', marginBottom: 16,
-                fontSize: 13, color: '#fca5a5', lineHeight: 1.5,
-              }}>{error}</div>
-            )}
-
-            {/* Hint for POS-registered clients */}
-            {mode === 'login' && (
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,.25)', marginBottom: 14 }}>
-                Registered at the shop? Use your phone number and password{' '}
-                <span style={{ color: 'rgba(255,255,255,.45)', fontWeight: 600 }}>
-                  Rwanda@123
-                </span>
-              </p>
-            )}
-
-            <button type="submit" disabled={loading} style={{
-              width: '100%', padding: 13, borderRadius: 10, border: 'none',
-              background: loading ? 'rgba(0,212,184,.4)' : '#00d4b8',
-              color: '#050e1a', fontWeight: 700, fontSize: 14,
-              cursor: loading ? 'not-allowed' : 'pointer',
-            }}>
-              {loading ? 'Please wait…' : mode === 'login' ? 'Sign In' : 'Create Account'}
-            </button>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: "4px" }}>Sign In →</button>
+            {error && <div className="auth-err">{error}</div>}
+            
+            <div className="demo-hint">
+              Demo: <strong>diane.uwimana@email.com</strong> / <strong>Diane2026</strong><br/>Active 10k Club member
+            </div>
           </form>
-        </div>
+        )}
+
+        {/* ── REGISTER FORM ── */}
+        {tab === "register" && (
+          <form id="reg-form" onSubmit={doRegister}>
+            <div className="scroll-form">
+              <div className="reg-label">Register as</div>
+              <div className="reg-type-row">
+                <div 
+                  className={`reg-type-btn ${regType === "ind" ? "active" : ""}`} 
+                  onClick={() => setRegType("ind")}
+                >
+                  <span className="reg-type-icon">👤</span>Individual
+                </div>
+                <div 
+                  className={`reg-type-btn ${regType === "biz" ? "active" : ""}`} 
+                  onClick={() => setRegType("biz")}
+                >
+                  <span className="reg-type-icon">🏢</span>Business
+                </div>
+              </div>
+
+              {/* INDIVIDUAL FIELDS */}
+              {regType === "ind" && (
+                <div id="form-ind">
+                  <div className="fg"><label className="fl">Full Name</label>
+                    <input type="text" className="fi" id="name" placeholder="Your full name" value={formData.name} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Phone Number</label>
+                    <input type="tel" className="fi" id="phone" placeholder="07X XXX XXXX" value={formData.phone} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Email</label>
+                    <input type="email" className="fi" id="email" placeholder="your@email.com" value={formData.email} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Neighbourhood / Hostel <span className="opt">(optional)</span></label>
+                    <input type="text" className="fi" id="area" placeholder="e.g. INES Campus Block B..." value={formData.area} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Referred by Dorm Boss <span className="opt">(optional)</span></label>
+                    <input type="text" className="fi" id="ref" placeholder="Dorm Boss name or code" value={formData.ref} onChange={handleChange} />
+                    <div className="fh">Enter if a Dorm Boss introduced you to Dream Wash</div></div>
+                </div>
+              )}
+
+              {/* BUSINESS FIELDS */}
+              {regType === "biz" && (
+                <div id="form-biz">
+                  <div className="fg"><label className="fl">Business Name</label>
+                    <input type="text" className="fi" id="bizname" placeholder="e.g. Hotel Virunga Lodge" value={formData.bizname} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Manager / Contact Name</label>
+                    <input type="text" className="fi" id="mgrname" placeholder="Manager full name" value={formData.mgrname} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Manager Phone</label>
+                    <input type="tel" className="fi" id="mgrphone" placeholder="07X XXX XXXX" value={formData.mgrphone} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Laundry Employee Name</label>
+                    <input type="text" className="fi" id="empname" placeholder="Person handling laundry" value={formData.empname} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Laundry Employee Phone</label>
+                    <input type="tel" className="fi" id="empphone" placeholder="07X XXX XXXX" value={formData.empphone} onChange={handleChange} /></div>
+                  <div className="fg"><label className="fl">Business Email</label>
+                    <input type="email" className="fi" id="email" placeholder="info@yourbusiness.com" value={formData.email} onChange={handleChange} /></div>
+                  
+                  <div className="fsep">
+                    <div className="fsep-title">📊 Service Requirements</div>
+                    <div className="fh" style={{ marginBottom: "14px" }}>Helps us prepare capacity and set your contract pricing.</div>
+                    <div className="fg"><label className="fl">Expected Weight per Week (kg)</label>
+                      <input type="number" className="fi" id="wkweight" placeholder="e.g. 50" min="1" value={formData.wkweight} onChange={handleChange} /></div>
+                    <div className="fg"><label className="fl">Type of Clothes / Linen</label>
+                      <select className="fi" id="clothtype" value={formData.clothtype} onChange={handleChange}>
+                        <option value="">Select type...</option>
+                        <option value="mixed">Mixed (uniforms + linen)</option>
+                        <option value="bed_linen">Bed Linen & Towels</option>
+                        <option value="uniforms">Staff Uniforms</option>
+                        <option value="other">Other</option>
+                      </select></div>
+                    <div className="fg"><label className="fl">Special Requirements</label>
+                      <textarea className="fi" id="expect" placeholder="e.g. Same-day pickup..." value={formData.expect} onChange={handleChange}></textarea></div>
+                  </div>
+                </div>
+              )}
+
+              {/* COMMON PASSWORD FIELDS */}
+              <div className="fg"><label className="fl">Password</label>
+                <input type="password" className="fi" id="password" placeholder="Minimum 6 characters" value={formData.password} onChange={handleChange} /></div>
+              <div className="fg"><label className="fl">Confirm Password</label>
+                <input type="password" className="fi" id="pass2" placeholder="Repeat password" value={formData.pass2} onChange={handleChange} /></div>
+
+              <button type="submit" className="btn btn-primary" style={{ marginTop: "6px" }}>Create Account →</button>
+              {error && <div className="auth-err">{error}</div>}
+              <div style={{ height: "16px" }}></div>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
 }
-
-const labelStyle = {
-  display: 'block', fontSize: 11, fontWeight: 600,
-  textTransform: 'uppercase', letterSpacing: '.07em',
-  color: 'rgba(255,255,255,.35)', marginBottom: 5,
-};
-const inputStyle = {
-  width: '100%', padding: '10px 13px',
-  background: 'rgba(255,255,255,.05)',
-  border: '1.5px solid rgba(255,255,255,.1)',
-  borderRadius: 8, color: '#fff', fontSize: 13, outline: 'none',
-};
