@@ -292,7 +292,7 @@ export default function OrderForm({ clients, onSuccess, toast }) {
         </div>
       )}
 
-      {/* Step 3 — Review */}
+            {/* Step 3 — Review */}
       {step === 3 && calc && client && (
         <div className="flex-col gap-2">
           <div className="card">
@@ -315,7 +315,7 @@ export default function OrderForm({ clients, onSuccess, toast }) {
             </button>
           </div>
         </div>
-      )} {/* <--- ADDED CLOSING FOR JSX CONDITIONAL RENDER */}
-    </div> {/* <--- ADDED CLOSING DIV FOR MAIN WRAPPER */}
+      )}
+    </div>
   );
-} // <--- ADDED CLOSING BRACKET FOR COMPONENT
+}
