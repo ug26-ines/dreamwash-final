@@ -154,7 +154,7 @@ export default function Plans({ user, activePlan, pendingSubscription, onSubscri
               {loading ? "Sending..." : isPending ? "Request Sent to Reception" : `Send Request — RWF ${fmt(plan.price)}`}
             </button>
             <div style={{ textAlign: "center", color: C.muted, fontSize: 11, marginTop: 12 }}>
-              Payment confirmed at the Dream Wash reception
+              Payment confirmed at the Dream X Wash reception
             </div>
           </>
         )}
