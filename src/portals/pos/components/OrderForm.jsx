@@ -316,5 +316,5 @@ export default function OrderForm({ clients, onSuccess, toast }) {
         </div>
       )}
     </div>
-  );
+  )
 }
