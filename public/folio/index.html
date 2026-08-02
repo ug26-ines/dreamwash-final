@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream X Industry</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: 247, 246, 242;      /* Warm off-white */
+            --card: 239, 236, 229;    /* Slightly darker cream */
+            --dark: 42, 42, 40;       /* Soft black */
+            --accent: 154, 140, 120;  /* Earthy brownish-grey */
+            --white: 255, 255, 255;
+            --status-live: 111, 138, 111;  /* muted sage, replaces clashing pure green */
+            --status-url: 139, 111, 174;   /* muted plum, replaces clashing pure violet */
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            background: rgb(var(--bg));
+            color: rgb(var(--dark));
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection { background: rgb(var(--accent)); color: white; }
+
+        a { color: inherit; }
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid rgb(var(--accent));
+            outline-offset: 2px;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* ---------- Nav ---------- */
+        .site-nav {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(var(--bg), 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 50;
+            border-bottom: 1px solid rgba(var(--accent), 0.2);
+        }
+        .nav-inner {
+            max-width: 1280px; margin: 0 auto; padding: 1rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif; font-size: 1.5rem;
+            font-weight: 600; letter-spacing: 0.02em; text-decoration: none;
+        }
+        .nav-links { display: none; gap: 2rem; font-size: 0.875rem; font-weight: 500; }
+        .nav-links a { text-decoration: none; transition: color 0.2s; }
+        .nav-links a:hover { color: rgb(var(--accent)); }
+        .btn-nav {
+            display: none; background: rgb(var(--dark)); color: white;
+            padding: 0.625rem 1.5rem; border-radius: 9999px; font-size: 0.875rem;
+            font-weight: 500; text-decoration: none; transition: background 0.3s;
+        }
+        .btn-nav:hover { background: rgb(var(--accent)); }
+        @media (min-width: 768px) {
+            .nav-links { display: flex; }
+            .btn-nav { display: inline-block; }
+        }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            padding: 8rem 1.5rem 5rem; max-width: 1280px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr; gap: 3rem; align-items: center;
+        }
+        @media (min-width: 768px) { .hero { grid-template-columns: 1fr 1fr; } }
+        .eyebrow {
+            color: rgb(var(--accent)); text-transform: uppercase; letter-spacing: 0.15em;
+            font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; display: block;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif; font-size: 2.25rem;
+            line-height: 1.25; margin: 0 0 1.5rem;
+        }
+        @media (min-width: 768px) { .hero h1 { font-size: 3rem; } }
+        .hero p {
+            font-size: 1.125rem; color: rgba(var(--dark), 0.7);
+            margin: 0 0 2rem; max-width: 28rem; line-height: 1.7;
+        }
+        .btn-primary {
+            display: inline-block; background: rgb(var(--dark)); color: white;
+            padding: 1rem 2rem; border-radius: 9999px; font-size: 0.875rem;
+            font-weight: 500; text-decoration: none; transition: background 0.3s;
+        }
+        .btn-primary:hover { background: rgb(var(--accent)); }
+        .hero-image { position: relative; height: 500px; border-radius: 1rem; overflow: hidden; }
+        .hero-image img { width: 100%; height: 115%; object-fit: cover; display: block; }
+
+        /* ---------- Ventures ---------- */
+        .section-ventures { padding: 5rem 1.5rem; background: rgb(var(--card)); }
+        .section-header { text-align: center; max-width: 1280px; margin: 0 auto 4rem; }
+        .section-header h2 { font-family: 'Playfair Display', serif; font-size: 2.25rem; margin: 0 0 1rem; }
+        .section-header p { color: rgba(var(--dark), 0.7); margin: 0; }
+        .venture-grid {
+            display: grid; gap: 1.5rem; max-width: 1280px; margin: 0 auto;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+        .venture-card {
+            background: rgb(var(--bg)); padding: 2rem; border-radius: 1rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            border: 1px solid rgba(var(--accent), 0.1);
+            transition: border-color 0.2s;
+        }
+        .venture-card:hover { border-color: rgba(var(--accent), 0.3); }
+        .venture-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin: 0 0 0.75rem; }
+        .venture-card p { font-size: 0.875rem; color: rgba(var(--dark), 0.7); line-height: 1.7; margin: 0 0 1.5rem; }
+        .venture-status { font-size: 0.875rem; margin: 0; }
+        .venture-status .live { color: rgb(var(--status-live)); }
+        .venture-status .url { color: rgb(var(--status-url)); }
+
+        /* ---------- Documents ---------- */
+        .section-docs { padding: 6rem 1.5rem; max-width: 1280px; margin: 0 auto; }
+        .docs-header { max-width: 42rem; margin: 0 0 4rem; }
+        .docs-header h2 { font-family: 'Playfair Display', serif; font-size: 2.25rem; margin: 0 0 1rem; }
+        .docs-header p { font-size: 1.125rem; color: rgba(var(--dark), 0.7); margin: 0; }
+        .docs-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        @media (min-width: 768px) { .docs-grid { grid-template-columns: repeat(2, 1fr); } }
+        .doc-card {
+            border: 1px solid rgba(var(--accent), 0.2); border-radius: 1rem;
+            padding: 2rem; transition: background 0.3s;
+        }
+        .doc-card:hover { background: rgb(var(--card)); }
+        .doc-card h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0 0 1rem; }
+        .doc-card p {
+            color: rgba(var(--dark), 0.7); margin: 0 0 2rem; line-height: 1.7;
+            white-space: pre-line;
+        }
+        .doc-card a {
+            font-size: 0.875rem; font-weight: 500; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 0.25rem; transition: color 0.2s;
+        }
+        .doc-card:hover a { color: rgb(var(--accent)); }
+        .doc-card--full { margin-top: 2rem; }
+
+        /* ---------- Team ---------- */
+        .section-team { padding: 6rem 1.5rem; background: rgb(var(--dark)); color: white; }
+        .section-team h2 {
+            font-family: 'Playfair Display', serif; font-size: 2.25rem;
+            margin: 0 0 4rem; text-align: center;
+        }
+        .team-grid {
+            display: grid; grid-template-columns: 1fr; gap: 2rem;
+            max-width: 1280px; margin: 0 auto;
+        }
+        @media (min-width: 768px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
+        .team-card {
+            background: rgba(var(--white), 0.05); padding: 2rem; border-radius: 1rem;
+            border: 1px solid rgba(var(--white), 0.1);
+        }
+        .team-card p { font-style: italic; color: rgba(var(--white), 0.8); line-height: 1.6; margin: 0 0 1.5rem; }
+        .team-person { display: flex; align-items: center; gap: 1rem; }
+        .team-avatar { width: 3rem; height: 3rem; border-radius: 50%; background: rgba(var(--accent), 0.5); flex-shrink: 0; }
+        .team-person h4 { font-weight: 500; margin: 0; }
+        .team-person span { font-size: 0.75rem; color: rgba(var(--white), 0.5); }
+
+        /* ---------- CTA banner (background image) ---------- */
+        .cta12{
+            position: relative;
+            padding: 8rem 1.3rem;
+            text-align: center;
+            background-image: url('image1.png');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        .cta-banner {
+            position: relative;
+            padding: 8rem 1.3rem;
+            text-align: center;
+            background-image: url('x.png');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        .cta-overlay {
+            position: absolute; inset: 0;
+        }
+        .cta-content { position: relative; z-index: 1; max-width: 48rem; margin: 0 auto; }
+        .cta-content h2 { font-family: 'Playfair Display', serif; font-size: 2.75rem; color: white; margin: 0 0 1.5rem; }
+        .cta-content p { font-size: 1.125rem; color: rgba(var(--white), 0.85); margin: 0 0 2.5rem; }
+        .cta-content .btn-primary {
+            background: white; color: rgb(var(--dark));
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            padding: 1.25rem 2.5rem; font-size: 1rem;
+        }
+        .cta-content .btn-primary:hover { background: rgb(var(--accent)); color: white; }
+
+        /* ---------- Footer ---------- */
+        .site-footer {
+            position: relative;
+            border-top: 1px solid rgba(var(--accent), 0.2);
+            padding: 1rem 1rem;
+            background-image: url('image0.png');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            
+        }
+        .footer-overlay {
+            position: absolute; inset: 0;
+        }
+        .footer-grid { position: relative; z-index: 1; display: flex; grid-template-columns: 1fr; gap: 10rem; max-width: 1280px; margin: 0 auto; }
+        @media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(4, 1fr); } }
+        .footer-brand { grid-column: span 1; }
+        @media (min-width: 768px) { .footer-brand { grid-column: span 2; } }
+        .footer-brand a {
+            font-family: 'Playfair Display', serif; font-size: 1.875rem; font-weight: 600;
+            margin: 3 0 0 0rem; display:flex; text-decoration: none; color: rgb(252, 252, 252);
+        }
+        .footer-col{text-align: left; align-content: center;}
+        .footer-brand p { font-size: 0.875rem; color: rgba(var(--white), 0.7); max-width: 20rem; margin: 0; text-align: left; }
+        .footer-col h4 { font-weight: 700; margin: 0 0 1rem; color: rgb(248, 244, 244); }
+        .footer-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem; }
+        .footer-col a { text-decoration: none; color: rgba(var(--white), 0.75); transition: color 0.2s; }
+        .footer-col a:hover { color: rgb(var(--accent)); }
+        .footer-bottom {
+            
+            position: relative; z-index: 1;
+            max-width: 1280px; margin: 2rem; padding-top: 2rem; padding-bottom: 1rem;
+            border-top: 1px solid rgba(var(--white), 0.2);
+            text-align: center; font-size: 0.75rem; color: rgba(var(--white), 0.5);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            * { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a href="#" class="logo">Dream X Industry.</a>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#services">Document</a>
+                <a href="#testimonials">Testimonials</a>
+            </div>
+            <a href="#contact" class="btn-nav">Schedule briefing</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div>
+            <span class="eyebrow">Meet FRESHBOY</span>
+            <h1>Entrepreneur, artist, committed to building infrastructure for Rwanda's next generation.</h1>
+            <p>
+                <!-- PUT YOUR STORY HERE -->
+                This is for you if you're ready to stop second-guessing. You've grown through a lot, done your best, and know you're capable — but something still feels unclear. Let's find your direction together.
+            </p>
+            <a href="#contact" class="btn-primary">Schedule Investor Briefing</a>
+        </div>
+        <div class="hero-image">
+            <!-- Replace src with your own image -->
+            <img src="ARI.JPEG" alt="Fresh Boy, Founder of Dream X Industry">
+        </div>
+    </section>
+
+    <!-- Ventures Grid -->
+    <section id="about" class="section-ventures">
+        <div class="section-header">
+            <h2>WHERE TO INVEST</h2>
+            <p>This is for you if you're ready to start investment journey.</p>
+        </div>
+        <div class="venture-grid">
+            <div class="venture-card">
+                <h3>DREAM X WASH</h3>
+                <p>Dream X Wash is a laundry service and technology company operating in Musanze, Rwanda, with expansion underway into Huye District. We're solving a problem every household, hotel, and institution in our market faces.</p>
+                <p class="venture-status"><span class="live">Visit us on live</span> <span class="url">dreamxwash.rw</span></p>
+            </div>
+            <div class="venture-card">
+                <h3>DREAM X CINEMA</h3>
+                <p>Dream X Cinema is the film and series production venture under Dream X Industry. Its core thesis: one story, per Rwandan district, plus Kigali — 28 total — building a body of work rooted in local narrative rather than imported content.</p>
+                <p class="venture-status"><span class="live">Visit us on live</span> <span class="url">dreamxcinema.rw</span></p>
+            </div>
+            <div class="venture-card">
+                <h3>DREAM X WINE</h3>
+                <p>Dream X Wine is the agriculture venture — banana wine built around fair payment to Rwandan farmers who are typically left out of the value chain when their crop gets turned into a finished, branded product.</p>
+                <p class="venture-status"><span class="live">Visit us on live</span> <span class="url">dreamxwine.rw</span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documents Section -->
+    <section id="services" class="section-docs">
+        <div class="docs-header">
+            <h2>Document</h2>
+            <p>Supportive document designed to help you study and understand rules and regulation, responsibility and benefit around every section in our company.</p>
+        </div>
+
+        <div class="docs-grid">
+            <div class="doc-card">
+                <h3>Corporate Governance & Authority Rules</h3>
+                <p>This branch defines who holds power, how decisions are executed, and where the lines between founders and investors are drawn.
+
+Board & Committee Structure: Composition of the Board of Directors, independent board members, and advisory committees.
+
+Reserved Matters & Voting Thresholds: A list of major actions that require supermajority investor approval.
+
+Thresholds of Authority (Delegation Matrix): Clear financial limits on what management can spend without board approval.</p>
+                <a href="#contact">Open Document &rarr;</a>
+            </div>
+            <div class="doc-card">
+                <h3>Capital Structure & Shareholder Regulations</h3>
+                <p>This branch protects equity integrity and establishes rules for funding rounds, equity distribution, and shareholder changes.
+
+Share Class & Voting Rights: Definitions of Preferred vs. Common shares, voting weight, and dividend priority.
+
+Pre-emptive Rights & Anti-Dilution: Standard mechanisms allowing existing investors to maintain their ownership percentage in future funding rounds.
+
+Transfer Restrictions: Right of First Refusal (ROFR) — existing shareholders get the first right to buy shares if someone wants to exit. Drag-Along & Tag-Along Rights protect majorities during an acquisition offer and minority investors from being left behind.
+
+Vesting & Founder Lock-in: 3-to-4-year vesting schedules with a 1-year cliff for founders and key executives to guarantee long-term commitment.</p>
+                <a href="#contact">Open Document &rarr;</a>
+            </div>
+            <div class="doc-card">
+                <h3>Financial & Operational Boundaries</h3>
+                <p>This branch sets financial discipline and defines how investment funds can and cannot be spent.
+
+Use of Proceeds (Budget Allocation): Strict rules ensuring funds raised are used specifically for agreed growth milestones (e.g., 50% equipment expansion, 30% marketing/logistics, 20% working capital).
+
+Debt & Leverage Caps: Limits on how much debt or third-party loans the company can take on relative to its equity or EBITDA.
+
+Treasury & FX Management: Guidelines for managing foreign exchange risk, cash holdings in local currency (RWF) vs. hard currency (USD), and bank counterparty limits.
+
+Financial Reporting & Audit Cadence: Mandatory schedules for monthly operational updates, quarterly financial statements, and annual audited financial statements by an accredited external firm.</p>
+                <a href="#contact">Open Document &rarr;</a>
+            </div>
+            <div class="doc-card">
+                <h3>Compliance, ESG & Operational Guardrails</h3>
+                <p>This branch ensures legal integrity, operational resilience, and environmental/social responsibility.
+
+Regulatory & Tax Compliance: Mandatory compliance with local commercial regulations (e.g., RDB registration, RRA tax compliance, labor laws).
+
+Environmental & Sustainability Standards (ESG): Rules on chemical/detergent handling, wastewater treatment, energy consumption management, and eco-friendly practices.
+
+Data Privacy & IP Protection: Safeguarding operational software, customer data (such as WhatsApp transaction records), and proprietary workflows under applicable data protection laws.</p>
+                <a href="#contact">Open Document &rarr;</a>
+            </div>
+        </div>
+
+        <div class="doc-card doc-card--full">
+            <h3>Remedies, Default & Dispute Resolution</h3>
+            <p>This branch details what happens when things go wrong, defining default scenarios and enforcement mechanisms.
+
+Events of Default: Explicit triggers for default (e.g., insolvency, material breach of contract, fraud, failure to provide audited financial statements for two consecutive periods).
+
+Remedies for Breach: Cure Periods (30-day window to rectify non-material breaches), Clawback Provisions (revocation of equity or bonuses from founders/executives in cases of fraud or gross negligence), and Investor Buyback Option (the right for investors to demand a buyback of their stake under severe default scenarios).
+
+Dispute Resolution Mechanism: Good-faith negotiation, then mediation, then binding arbitration.</p>
+            <a href="#contact">Open Document &rarr;</a>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="section-team">
+        <h2>Words from the team</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <p>"I didn't start Dream X Industry to run one business — I started it to build the infrastructure Rwanda's next generation actually needs. From laundry to storytelling to fair trade in agriculture, every venture under this umbrella solves a problem I saw firsthand growing up in Musanze. Scaling that vision means bringing in people who don't just execute — they own their piece of it."</p>
+                <div class="team-person">
+                    <div class="team-avatar"></div>
+                    <div>
+                        <h4>FRESHBOY</h4>
+                        <span>ceo</span>
+                    </div>
+                </div>
+            </div>
+            <div class="team-card">
+                <p>"I joined Dream X Industry because it wasn't asking me to fill a seat — it was asking me to own outcomes. Whether it's getting a shoot done on budget, keeping a farmer relationship honest, or making sure a delivery route runs on time, the culture here is: you're not staff, you're a stakeholder in whether this actually works."</p>
+                <div class="team-person">
+                    <div class="team-avatar"></div>
+                    <div>
+                        <h4>Michael Johnson</h4>
+                        <span>Entrepreneur</span>
+                    </div>
+                </div>
+            </div>
+            <div class="team-card">
+                <p>"Vision only becomes real when it's operational. My role is making sure every venture — Wash, Cinema, Wine, Distribution — runs on the same discipline: clear reporting, accountable teams, and numbers that hold up under scrutiny."</p>
+                <div class="team-person">
+                    <div class="team-avatar"></div>
+                    <div>
+                        <h4>Emily Parker</h4>
+                        <span>operation manager</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Banner --> <div class="cta12">
+    <section id="contact" class="cta-banner">
+        <div class="cta-overlay"></div>
+        <div class="cta-content">
+            <h2>Partner with Us Today</h2>
+            <p>Connect with our team to review market traction, examine our financial metrics, and explore high-yield investment opportunities.</p>
+            <a href="mailto:dream1industry@gmail.com" class="btn-primary">Schedule Your Investor Briefing</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-overlay"></div>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" style="padding-left: 0px; margin-left: 0px ;">Dream X Industry.</a><br>
+                <p>Building the infrastructure Rwanda's next generation needs — laundry, storytelling, agriculture, and distribution, under one roof.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Pages</h4>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Document</a></li>
+                    <li><a href="#testimonials">Our Team</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>COntact Us</h4>
+                <ul style="color: white ;">
+                    
+                    <li>PHONE : 0794468471</li>
+                    <li>EMAIL : dream1industry@gmail.com</li>
+                    <li><a href="#testimonials">WhatsApp us</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom" style="font-size: larger; font-weight: bolder; padding-bottom: 1px;">&copy; 2026 Dream X Industry.</div>
+    </footer>
+</div>
+
+</body>
+</html>
